@@ -1,94 +1,66 @@
-# CanariasCerca — Interactive Engineering Portfolio Demo
+# CanariasCerca · Engineering Case Study
 
-[**Live demonstration**](https://paulinap92.github.io/canarias-cerca-demo/) *(available after the repository is created and Pages is enabled)* · [Production product](https://canariascerca.es)
+**Interactive technical portfolio:** [Live demo](https://paulinap92.github.io/canarias-cerca-demo/) · [Real production website](https://canariascerca.es)
 
-> **Public-safe portfolio case study.** Not a mirror of the production application. All location collection records and operational observations are independently prepared examples; weather, calima, seismic values and tourism indexes are fabricated.
+This repository is **not a copy of the CanariasCerca tourism portal**. It is an English-language, recruiter-oriented engineering walkthrough of the platform's backend design: data ingestion, refresh jobs, typed FastAPI routes, validation, persistence boundaries and frontend delivery.
 
-## Authentic product screenshots
+## What you can actually try
 
-Two **real screenshots of the public production homepage**, captured by the project owner with Playwright on **November 26, 2026**, are included in `screenshots/`:
+| Module | Interactive behavior | Source of truth |
+| --- | --- | --- |
+| Data pipeline | Select nodes, replay a successful refresh or injected provider outage | Conceptual architecture grounded in backend modules |
+| FastAPI playground | Modify `island`, `limit`; receive typed success/422-style error examples | The real FastAPI places route uses `Query(100, ge=1, le=500)` |
+| Background jobs | Replay task traces and inspect intervals | The backend cache-warmer defines 600 / 1800 / 3600 / 21600-second loops |
+| Code browser | FastAPI route, `asyncio` loop, validation example, JavaScript | Marked excerpts: authentic structure, adapted or illustrative when noted |
+| Design decisions | Read about snapshot fallback, request contracts and read/write separation | Engineering rationale, not confidential implementation |
 
-- [Desktop — 1440 × 900](screenshots/production-desktop.png)
-- [Mobile — 390 × 844](screenshots/production-mobile.png)
+**Important limitation:** the interactive web app is static JavaScript hosted on GitHub Pages. It does **not** run FastAPI, connect to Neon, perform real data ingestion or query production. All sample responses, places and logs are fictional. Job intervals listed are taken from the cache-warmer module; they do not prove an end-to-end provider refresh SLA.
 
-They appear responsively in the hero and in the expandable screenshot gallery, with links to the original PNG files. Capture provenance is recorded in [screenshots/capture-metadata.json](screenshots/capture-metadata.json) and the [screenshot gallery documentation](docs/production-screenshots.md). Screenshots show the **real public product**, while the surrounding interactive portfolio demo uses **fictional offline data**.
+## Technologies used in the real system
 
-To capture updated public screenshots on Windows using `uv`:
+`Python` · `FastAPI` · `Pydantic / Query` · `PostgreSQL / Neon` · `asyncio / httpx` · `MapLibre GL JS` · `JavaScript` · `GitHub Actions`
 
-```powershell
-uv run --with playwright python -m playwright install chromium
-uv run --with playwright python tools/capture_public_site.py
-```
-
-Review any new captures before publishing. The helper opens the public homepage only and does not authenticate to a CMS or access production Studio.
-
-## Real source excerpt (selected, non-secret)
-
-The architecture section contains a short excerpt from **app/api/places.py**, with formatting simplified for readability. Additional small samples are in [docs/source-excerpts.md](docs/source-excerpts.md). The real repositories, prompts, database credentials, and operational implementation remain private.
-
-## What can you try?
-
-| Interactive section | What it demonstrates |
-| --- | --- |
-| Explore & Map | MapLibre GL JS, search, island/category filters, selectable geographic points |
-| Live data layers | Weather, PM10/calima, seismic sample observations and a local pipeline job simulation |
-| Analytics | Interactive monthly index chart, separation of ingestion from reporting |
-| Editorial Studio | Local draft selection, title/summary editing and publication-card preview |
-| Architecture | Clear FastAPI/Pydantic, PostgreSQL/Neon, Python jobs, MapLibre responsibilities |
-
-**Production-oriented technical scope:** FastAPI, Pydantic, Python, PostgreSQL/Neon, MapLibre, scheduled ingestion, data normalization, API responses, editorial controls and data visualizations.
-
-The Pages implementation is **vanilla JavaScript** for safe browser-only interaction. GitHub Pages does not run FastAPI or database services. There are no API calls to production in this repository. A job button simulates state updates locally; it is not a production scheduler.
-
-## System architecture
+## Architecture
 
 ```mermaid
 flowchart LR
-  subgraph PUBLIC[Public facing]
-    WEB[Responsive frontend / MapLibre]
-    CHARTS[Tourism analytics views]
-    STUDIO[Editorial Studio]
-  end
-  subgraph BACKEND[Production system — conceptual]
-    API[FastAPI · Pydantic]
-    JOBS[Python jobs / scheduled ingestion]
-    VALID[Data normalization + validation]
-    DB[(PostgreSQL / Neon)]
-    SRC[External data providers]
-  end
-  WEB --> API
-  CHARTS --> API
-  STUDIO --> API
-  SRC --> JOBS --> VALID --> DB
-  API <--> DB
+    A[External providers] --> B[Scheduled Python jobs]
+    B --> C{Normalize and validate}
+    C -->|Accepted| D[(Saved snapshot / PostgreSQL)]
+    C -->|Rejected| E[Keep last known good data]
+    E --> D
+    D --> F[FastAPI typed GET routes]
+    F --> G[JavaScript / MapLibre frontend]
 ```
 
-See [architecture notes](docs/architecture.md) and [security boundary](SECURITY.md).
+See the live pipeline node inspector for design details. The diagram is deliberately high-level and does not expose private persistence mappings or provider configuration.
 
-## Language policy
+## Source excerpt policy
 
-The public user interface uses **Spanish** for the target audience. Technical documentation, source identifiers, code comments, test descriptions, Git commit messages, and architecture notes are in **English**. Fictional editorial content follows the interface language.
+Excerpts are deliberately small, with formatting normalized for readability and internal integration code omitted. The repository does **not** include credentials, production prompts, provider configurations, proprietary data models or full copies of private repositories. Pydantic and client-side JavaScript snippets explicitly identify which examples are illustrative versus sourced.
 
-## Local development
+## Real screenshots
+
+The optional product-reference gallery contains two screenshots of the public homepage captured with Playwright, available at `screenshots/production-desktop.png` and `screenshots/production-mobile.png`. They are intentionally **not the hero or the focus**: reviewers can open the real product instead.
+
+## Run & test locally
 
 ```bash
 python -m http.server 8000
-# http://localhost:8000
+# open http://localhost:8000
+node --test tests/*.test.js
 ```
 
-Run tests with `npm test` (Node.js 20+; no install needed).
+No dependency installation is needed for tests. A GitHub Actions workflow runs tests on each push and deploys to GitHub Pages.
 
-## GitHub Pages deployment
+## Security and accuracy
 
-1. Create a public repository named `canarias-cerca-demo` under `paulinap92`.
-2. Push the **contents of this directory** to its `main` branch (not the parent folder).
-3. Set **Settings → Pages → Build and deployment → Source: GitHub Actions**.
-4. Workflow `.github/workflows/pages.yml` tests and publishes the static site on pushes to `main`.
+- No production API calls in the browser implementation.
+- No database or provider tokens, production credentials or internal endpoints.
+- Clearly labeled fictitious fixture data and no invented production metrics.
+- All technical documentation, code, comments, commits and recruiter-facing UI are in English.
+- This project does not modify or deploy the real CanariasCerca product.
 
-This repo is standalone and cannot affect any production deployment.
+---
 
-## Engineering story
-
-The real product joins maps, curated content, continuous collection of external observations and visualization. The case study emphasizes typed API boundaries, data quality, ingestion orchestration, fallbacks and user-facing exploration. Its aim is to communicate engineering decisions without publishing proprietary implementation details.
-
-**Privacy:** No production schemas, prompts, passwords, tokens, private endpoint names, internal configuration or copied private source code.
+**Portfolio focus:** backend systems thinking, validation contracts, robust ingestion and failure handling, not a visual recreation of a tourism website.

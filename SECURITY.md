@@ -1,13 +1,11 @@
-# Demonstration security boundary
+# Public portfolio security boundary
 
-## Safe by design
+This standalone engineering case study is intentionally isolated from production. It uses no secrets, tokens, database connections, privileged backend endpoints, authenticated sessions, live AI generation, or real publishing actions.
 
-- This repository is authored independently for a public portfolio.
-- Content is fabricated and locally bundled; it was **not** exported from a production database.
-- No full private modules, API credentials, secrets, connection strings, proprietary prompts, provider keys or authentication bypasses are included. Only two short, carefully reviewed source excerpts (with simplified formatting) are intentionally shown to illustrate framework use.
-- The Pages website is static; nothing on this demo can call production APIs, modify CMS state or publish to external services.
-- Third-party CDN assets (such as Google Fonts and, for CanariasCerca, MapLibre/demo tiles) are public rendering resources and not production integrations.
-- Public client-side source is inherently visible to visitors. All runnable showcase code is independent; short server-side excerpts are documentation only and never executed by GitHub Pages.
-- Only publicly accessible homepage screenshots are allowed. Never capture or publish an authenticated Studio, browser session, private user data, analytics dashboards behind login, or browser developer tools showing credentials.
+- The browser replay is deterministic; its event records, logs, status objects and outputs are fictitious.
+- Short code examples are labeled as redacted/adapted source structure or illustrative patterns.
+- The optional screenshots show only the already-public production homepage.
+- No private repository contents are copied wholesale into this repository.
+- GitHub Actions runs tests and deploys a static site; it does not run ingestion or CMS jobs.
 
-Before publication, audit new content and any future pull requests for hardcoded secrets and production URLs.
+If you find a potentially sensitive detail, please report it privately rather than opening a public issue containing that detail.
