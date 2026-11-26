@@ -1,0 +1,18 @@
+flowchart LR
+  subgraph PUBLIC[Public facing]
+    WEB[Responsive frontend / MapLibre]
+    CHARTS[Tourism analytics views]
+    STUDIO[Editorial Studio]
+  end
+  subgraph BACKEND[Production system — conceptual]
+    API[FastAPI · Pydantic]
+    JOBS[Python jobs / scheduled ingestion]
+    VALID[Data normalization + validation]
+    DB[(PostgreSQL / Neon)]
+    SRC[External data providers]
+  end
+  WEB --> API
+  CHARTS --> API
+  STUDIO --> API
+  SRC --> JOBS --> VALID --> DB
+  API <--> DB
